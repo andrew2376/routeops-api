@@ -8,6 +8,12 @@ import {
   Settings,
   Route,
 } from 'lucide-react'
+import type { Seccion } from '../App'
+
+interface SidebarProps {
+  seccionActual: Seccion
+  onCambiarSeccion: (seccion: Seccion) => void
+}
 
 const menuItems = [
   { label: 'Dashboard', icon: LayoutDashboard },
@@ -17,7 +23,10 @@ const menuItems = [
   { label: 'Operaciones', icon: ClipboardList },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({
+  seccionActual,
+  onCambiarSeccion,
+}: SidebarProps) {
   return (
     <aside className="flex min-h-screen w-64 shrink-0 flex-col border-r border-slate-200 bg-white p-5">
       <div className="mb-10 flex items-center gap-3">
@@ -35,23 +44,43 @@ export default function Sidebar() {
       </p>
 
       <nav className="flex-1 space-y-2">
-        {menuItems.map(({ label, icon: Icon }, index) => (
-          <button
-            key={label}
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium transition ${
-              index === 0
-                ? 'bg-blue-50 text-blue-700'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <Icon size={19} />
-            {label}
-          </button>
-        ))}
+        {menuItems.map(({ label, icon: Icon }) => {
+          const seleccionable =
+            label === 'Dashboard' || label === 'Conductores'
+          const activo = seccionActual === label
+
+          return (
+            <button
+              key={label}
+              onClick={() => {
+                if (label === 'Dashboard' || label === 'Conductores') {
+                  onCambiarSeccion(label)
+                }
+              }}
+              disabled={!seleccionable}
+              className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium transition ${
+                activo
+                  ? 'bg-blue-50 text-blue-700'
+                  : seleccionable
+                    ? 'text-slate-600 hover:bg-slate-50'
+                    : 'cursor-not-allowed text-slate-400'
+              }`}
+            >
+              <Icon size={19} />
+              {label}
+              {!seleccionable && (
+                <span className="ml-auto text-[10px]">Próximamente</span>
+              )}
+            </button>
+          )
+        })}
       </nav>
 
       <div className="border-t border-slate-200 pt-4">
-        <button className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-slate-600 hover:bg-slate-50">
+        <button
+          disabled
+          className="flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-3 py-3 text-sm text-slate-400"
+        >
           <Settings size={19} />
           Configuración
         </button>
